@@ -1,5 +1,10 @@
 <?php
 
+/* Copyright 2009 Grégoire HUBERT
+ *
+ * This is free software
+ * See the LICENCE file
+ */
 abstract class LdapObject implements ArrayAccess
 {
   const EXIST    = 1;
