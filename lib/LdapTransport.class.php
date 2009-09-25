@@ -21,18 +21,19 @@ abstract class LdapTransport
 
   public function __construct()
   {
-    if (!$this->handler = ldap_connect(sfConfig::get('app_ldap_host', 'localhost'), sfConfig::get('app_ldap_port', 389)))
+    if (!$this->handler = @ldap_connect(sfConfig::get('app_ldap_host', 'localhost'), sfConfig::get('app_ldap_port', 389)))
     {
-      throw new Exception(sprintf('Error while connecting to ldap host "%s", port "%s"',
+      throw new LdapTransportException(sprintf('Error while connecting to ldap host "%s", port "%s <br />LDAP said «%s»."',
         sfConfig::get('app_ldap_host'),
-        sfConfig::get('app_ldap_port')));
+        sfConfig::get('app_ldap_port'),
+        ldap_error($this->handler)));
     }
 
     ldap_set_option($this->handler, LDAP_OPT_PROTOCOL_VERSION, 3);
 
-    if (!ldap_bind($this->handler, sfConfig::get('app_ldap_dn'), sfConfig::get('app_ldap_pass')))
+    if (!@ldap_bind($this->handler, sfConfig::get('app_ldap_dn'), sfConfig::get('app_ldap_pass')))
     {
-      throw new Exception(sprintf('Could not bind to LDAP tree dn="%s", server said «%s»', sfConfig::get('app_ldap_dn'), ldap_error()));
+      throw new LdapTransportException(sprintf('Could not bind to LDAP tree dn="%s", server said «%s»', sfConfig::get('app_ldap_dn'), ldap_error($this->handler)));
     }
   }
 
@@ -63,7 +64,7 @@ abstract class LdapTransport
         return true;
     else 
     {
-      throw new Exception(sprintf('Could not add object'));
+      throw new LdapTransportException(sprintf('Could not add object'));
         return false;
     }
   }
@@ -76,7 +77,7 @@ abstract class LdapTransport
         return true;
     else 
     {
-      throw new Exception(sprintf('Could not delete object'));
+      throw new LdapTransportException(sprintf('Could not delete object'));
         return false;
     }
   }

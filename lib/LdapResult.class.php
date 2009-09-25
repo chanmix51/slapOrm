@@ -24,7 +24,7 @@ class LdapResult implements arrayAccess, iterator, countable
       else
       {
         $object = new $class();
-        $object->hydrate($result);
+        $object->hydrateFromLdap($result);
         $this->result[] = $object;
       }
     }
