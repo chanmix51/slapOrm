@@ -10,8 +10,12 @@ class LdapResult implements arrayAccess, iterator, countable
   protected $elt_count;
   protected $transport;
 
-  public function __construct(array $result_set = array(), LdapTransport $transport)
+  public function __construct($result_set, LdapTransport $transport)
   {
+    if (is_null($result_set))
+    {
+      $result_set = array();
+    }
     $this->transport = $transport;
     $class = $this->transport->getClassName();
 
@@ -25,6 +29,7 @@ class LdapResult implements arrayAccess, iterator, countable
       {
         $object = new $class();
         $object->hydrateFromLdap($result);
+        SlapOrm::getInstance()->setIntoMap($object);
         $this->result[] = $object;
       }
     }

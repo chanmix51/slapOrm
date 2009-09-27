@@ -25,7 +25,7 @@ abstract class LdapObject implements ArrayAccess
     {
       throw new LdapException('No dn to hydrate the object. Given values :<br /><pre>%s</pre>', print_r($ldap_vars, true));
     }
-    $this->db = $ldap_vars['dn'];
+    $this->dn = $ldap_vars['dn'];
     unset($ldap_vars['dn']);
 
     if (!array_key_exists('count', $ldap_vars))

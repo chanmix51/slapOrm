@@ -12,11 +12,29 @@ abstract class LdapTransport
 
   abstract public function getClassName();
 
-  public function getByDn($node)
-  {
-    $dn = $this->base_dn.','.$node;
+  abstract public function getAttributes();
 
-    return $this->ldap_search($dn);
+  public function createQuery()
+  {
+    $query = new LdapQuery();
+    $query->setAttributes($this->getAttributes());
+
+    return $query;
+  }
+
+  public function getByCn($cn)
+  {
+    $slap_orm = SlapOrm::getInstance();
+
+    $object = $slap_orm->getFromMap($cn.','.$this->base_dn);
+    if (!$object)
+    {
+      $query = $this->createQuery()->setCn($cn)->setLimit(1);
+      $result = $this->ldap_search($query);
+      $object = count($result) == 1 ? $result[0] : null;
+    }
+
+    return $object;
   }
 
   public function __construct()
@@ -42,9 +60,16 @@ abstract class LdapTransport
     ldap_unbind($this->handler);
   }
 
-  public function ldap_search($filters = '', $attributes = array())
+  public function ldap_search(LdapQuery $query)
   {
-    $res = ldap_search($this->handler, $this->base_dn, $filters, $attributes);
+    $dn = $query->getCn() !== '' ? $query->getCn().','.$this->base_dn : $this->base_dn;
+
+    $res = ldap_search($this->handler, $dn, $query->getFilters(), $query->getAttributes(), 0, $query->getLimit());
+
+    if ($res === false)
+    {
+      throw new LdapTransportException(sprintf('Error during the query "%s" on dn=«%s». <br />Ldap said «%s»', $query, $dn, ldap_error($this->handler)));
+    }
 
     return new LdapResult(ldap_get_entries($this->handler, $res), $this);
   }
