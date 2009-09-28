@@ -37,7 +37,7 @@ abstract class LdapTransport
     return $object;
   }
 
-  public function __construct()
+  protected function openConnection()
   {
     if (!$this->handler = @ldap_connect(sfConfig::get('app_ldap_host', 'localhost'), sfConfig::get('app_ldap_port', 389)))
     {
@@ -46,7 +46,11 @@ abstract class LdapTransport
         sfConfig::get('app_ldap_port'),
         ldap_error($this->handler)));
     }
+  }
 
+
+  public function bindToLdap()
+  {
     ldap_set_option($this->handler, LDAP_OPT_PROTOCOL_VERSION, 3);
 
     if (!@ldap_bind($this->handler, sfConfig::get('app_ldap_dn'), sfConfig::get('app_ldap_pass')))
@@ -55,9 +59,16 @@ abstract class LdapTransport
     }
   }
 
-  public function __destruct()
+  public function __construct()
   {
-    ldap_unbind($this->handler);
+    $this->handler = SlapOrm::getInstance()->getConnectionFor($this->getClassName());
+
+    if (is_null($this->handler))
+    {
+      $this->openConnection();
+      SlapOrm::getInstance()->setConnectionFor($this->getClassName(), $this->handler);
+      $this->bindToLdap();
+    }
   }
 
   public function ldap_search(LdapQuery $query)

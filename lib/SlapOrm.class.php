@@ -4,6 +4,15 @@ class SlapOrm
 {
   protected static $instance;
   protected $data_map = array();
+  protected $connections = array();
+
+  public function __destruct()
+  {
+    foreach ($this->connections as $connection)
+    {
+      ldap_unbind($connection);
+    }
+  }
 
   public static function getInstance()
   {
@@ -28,5 +37,15 @@ class SlapOrm
   public function existInMap($dn)
   {
     return array_key_exists($dn, $this->data_map);
+  }
+
+  public function getConnectionFor($classname)
+  {
+    return array_key_exists($classname, $this->connections) ? $this->connections[$classname] : null;
+  }
+
+  public function setConnectionFor($classname, $handler)
+  {
+    $this->connections[$classname] = $handler;
   }
 }
