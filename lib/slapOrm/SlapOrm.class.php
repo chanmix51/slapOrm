@@ -2,6 +2,8 @@
 
 class SlapOrm
 {
+  const VERSION='Alpha';
+
   protected static $instance;
   protected $data_map = array();
   protected $connections = array();
