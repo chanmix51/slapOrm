@@ -123,7 +123,7 @@ abstract class LdapObject implements ArrayAccess
       return $this->__get($attribute);
       break;
     default:
-      throw new RunTimeException(sprintf('No such method "%s:%s()"', get_class($this), $method));
+      throw new LdapException(sprintf('No such method "%s:%s()"', get_class($this), $method));
     }
   }
 
@@ -155,6 +155,6 @@ abstract class LdapObject implements ArrayAccess
 
   public function debug()
   {
-    throw new Exception(sprintf('<br /><pre>%s</pre>', print_r($this, true)));
+    throw new LdapException(sprintf('<br /><pre>%s</pre>', print_r($this, true)));
   }
 }
