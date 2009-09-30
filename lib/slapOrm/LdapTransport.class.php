@@ -48,7 +48,6 @@ abstract class LdapTransport
     }
   }
 
-
   public function bindToLdap()
   {
     ldap_set_option($this->handler, LDAP_OPT_PROTOCOL_VERSION, 3);
@@ -88,7 +87,7 @@ abstract class LdapTransport
   public function ldap_modify($dn = LdapObject, $entry = array())
   {
     $this->res = ldap_modify($this->handler, $dn, $entry);
-    
+
     return (ldap_error($this->handler) == "Success");
   }
 
