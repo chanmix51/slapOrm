@@ -83,6 +83,7 @@ EOF;
   {
     $this->log(sprintf('Creating base model file for class "%s"', $class_name));
     $attributes = '\''.join('\', \'', array_keys($this->schema[$class_name]['attributes'])).'\'';
+    $fields = $this->generateFieldsCode($class_name);
     $object_class = $this->schema[$class_name]['objectClass'];
     $dn = $this->schema[$class_name]['dn'];
     $version = SlapOrm::VERSION;
@@ -101,9 +102,9 @@ class Base${class_name}Map extends LdapTransport
   protected \$attributes = array($attributes);
   protected \$object_class = '$object_class';
 
-  public function getAttributes()
+  public function configure()
   {
-    return \$this->attributes;
+$fields
   }
 
   public function getClassName()
@@ -147,4 +148,28 @@ EOF;
       }
     }
   }
+
+  protected function generateFieldsCode($class_name)
+  {
+    $fields = "";
+    foreach ($this->schema[$class_name]['attributes'] as $field_name => $parameters)
+    {
+      $fields .= sprintf('    $this->fields[\'%s\'] = new Ldap%sField(%s);', strtolower($field_name), sfInflector::camelize($parameters['type']), $this->convertArrayInPhp($parameters));
+      $fields .= "\n";
+    }
+
+    return $fields;
+  }
+
+    protected function convertArrayInPhp(array $array)
+    {
+      $fields = "array(";
+      foreach($array as $key => $value)
+      {
+        $fields .= "'$key' => '$value',";
+      }
+      $fields .= ')';
+
+      return $fields;
+    }
 }

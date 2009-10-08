@@ -9,10 +9,14 @@ abstract class LdapTransport
 {
   protected $handler;
   protected $base_dn;
+  protected $fields;
+  protected $attributes = array();
 
   abstract public function getClassName();
 
-  abstract public function getAttributes();
+  public function configure()
+  {
+  }
 
   public function createQuery()
   {
@@ -69,6 +73,8 @@ abstract class LdapTransport
       SlapOrm::getInstance()->setConnectionFor($this->getClassName(), $this->handler);
       $this->bindToLdap();
     }
+
+    $this->configure();
   }
 
   public function ldap_search(LdapQuery $query)
@@ -123,4 +129,17 @@ abstract class LdapTransport
     return $this->handler;
   }
 
+  public function getAttributes()
+  {
+    return $this->attributes;
+  }
+
+  public function getField($name)
+  {
+    if (array_key_exists($name, $this->fields))
+    {
+      return $this->fields[$name];
+    }
+    return null;
+  }
 }

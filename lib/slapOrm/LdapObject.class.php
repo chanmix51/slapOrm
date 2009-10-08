@@ -35,7 +35,14 @@ abstract class LdapObject implements ArrayAccess
 
     foreach($this->extractAttributes($ldap_vars) as $attribute)
     {
-      $this->$attribute = $this->extractValues($ldap_vars[$attribute]);
+      if (SlapOrm::getMapInstanceOf(get_class($this))->getField($attribute)->getMultiple())
+      {
+        $this->$attribute = $ldap_vars[$attribute];
+      }
+      else
+      {
+        $this->$attribute = $this->extractValues($ldap_vars[$attribute]);
+      }
     }
 
     $this->state = self::EXIST;
