@@ -82,8 +82,8 @@ EOF;
   protected function generateBaseClassesFor($class_name)
   {
     $this->log(sprintf('Creating base model file for class "%s"', $class_name));
-    $attributes = '\''.join('\', \'', $this->schema[$class_name]['attributes']).'\'';
-
+    $attributes = '\''.join('\', \'', array_keys($this->schema[$class_name]['attributes'])).'\'';
+    $object_class = $this->schema[$class_name]['objectClass'];
     $dn = $this->schema[$class_name]['dn'];
     $version = SlapOrm::VERSION;
     $code = <<<EOF
@@ -99,6 +99,7 @@ class Base${class_name}Map extends LdapTransport
 {
   protected \$base_dn = "$dn";
   protected \$attributes = array($attributes);
+  protected \$object_class = '$object_class';
 
   public function getAttributes()
   {
@@ -108,6 +109,11 @@ class Base${class_name}Map extends LdapTransport
   public function getClassName()
   {
     return '${class_name}';
+  }
+
+  public function fetchAll()
+  {
+    return \$this->ldap_search(\$this->createQuery());
   }
 }
 EOF;

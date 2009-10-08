@@ -8,10 +8,11 @@
 
 class LdapQuery 
 {
-  protected $cn = '';
-  protected $filters = '';
-  protected $limit = 0;
-  protected $attributes = array();
+  protected $cn          = '';
+  protected $filters;
+  protected $limit       = 0;
+  protected $attributes  = array();
+  protected $objectClass = '';
 
   public function setCn($cn)
   {
@@ -49,16 +50,30 @@ class LdapQuery
     return $this->attributes;
   }
 
-  public function setFilters($filters)
+  public function createFilter(LdapBaseQueryOperator $operator)
   {
-    $this->filters = $filters;
+    $this->filters = $operator;
+
+    return $this;
+  }
+
+  public function addAndFilter(LdapBaseQueryOperator $operator)
+  {
+    $this->filters = new LdapAndQueryOperator($this->filters, $operator);
+
+    return $this;
+  }
+
+  public function addOrFilter(LdapBaseQueryOperator $operator)
+  {
+    $this->filters = new LdapOrQueryOperator($this->filters, $operator);
 
     return $this;
   }
 
   public function getFilters()
   {
-    return $this->filters;
+    return (string)$this->filters;
   }
 
   public function __toString()

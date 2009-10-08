@@ -18,6 +18,7 @@ abstract class LdapTransport
   {
     $query = new LdapQuery();
     $query->setAttributes($this->getAttributes());
+    $query->createFilter(new LdapEqualQueryOperator('objectClass', $this->object_class));
 
     return $query;
   }

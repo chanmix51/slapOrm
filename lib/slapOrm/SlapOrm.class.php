@@ -2,11 +2,18 @@
 
 class SlapOrm
 {
-  const VERSION='Alpha';
+  const VERSION='Alpha-2';
 
   protected static $instance;
   protected $data_map = array();
   protected $connections = array();
+
+  public static function getMapInstanceOf($model_class)
+  {
+    $model_class = $model_class.'Map';
+
+    return new $model_class;
+  }
 
   public function __destruct()
   {
