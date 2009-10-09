@@ -22,7 +22,7 @@ abstract class LdapTransport
   {
     $query = new LdapQuery();
     $query->setAttributes($this->getAttributes());
-    $query->createFilter(new LdapEqualQueryOperator('objectClass', $this->object_class));
+    $query->createFilter(new LdapCompareQueryOperator('objectClass', $this->object_class));
 
     return $query;
   }
@@ -141,5 +141,21 @@ abstract class LdapTransport
       return $this->fields[$name];
     }
     return null;
+  }
+
+  public function findAll()
+  {
+    return $this->ldap_search($this->createQuery());
+  }
+
+  public function fetchOne($query)
+  {
+    $query->setLimit(1);
+    $results = $this->ldap_search($query);
+
+    if ($results->count())
+    {
+      return $results[0];
+    }
   }
 }

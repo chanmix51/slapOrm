@@ -111,11 +111,6 @@ $fields
   {
     return '${class_name}';
   }
-
-  public function fetchAll()
-  {
-    return \$this->ldap_search(\$this->createQuery());
-  }
 }
 EOF;
     $this->createFile('base/Base'.$class_name.'Map.class.php', $code);
