@@ -2,12 +2,6 @@
 
 class LdapDnField extends BaseLdapField
 {
-  public function __construct($multiple = false)
-  {
-    $this->type = 'dn';
-    $this->multiple = $multiple;
-  }
-
   public function getWidget()
   {
     return new sfWidgetFormInput();

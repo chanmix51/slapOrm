@@ -161,15 +161,24 @@ EOF;
     return $fields;
   }
 
-    protected function convertArrayInPhp(array $array)
+  protected function convertArrayInPhp(array $array)
+  {
+    $fields = "array(";
+    foreach($array as $key => $value)
     {
-      $fields = "array(";
-      foreach($array as $key => $value)
+      switch(strtolower(gettype($value)))
       {
+      case "boolean":
+        $value = $value ? 'true' : 'false';
+      case "integer":
+        $fields .= "'$key' => $value,";
+        break;
+      default:
         $fields .= "'$key' => '$value',";
       }
-      $fields .= ')';
-
-      return $fields;
     }
+    $fields .= ')';
+
+    return $fields;
+  }
 }
