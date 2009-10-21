@@ -7,11 +7,12 @@
  */
 abstract class LdapObject implements ArrayAccess
 {
+  const NONE     = 0;
   const EXIST    = 1;
   const MODIFIED = 2;
 
   protected $vars = array();
-  protected $state = 0;
+  protected $state = self::NONE;
   protected $dn;
 
   public function getDn()
@@ -136,26 +137,45 @@ abstract class LdapObject implements ArrayAccess
 
   protected function modify()
   {
-    if (!$this->state && self::MODIFIED)
-    {
-      $this->state = $this->state + self::MODIFIED;
-    }
+    $this->state = !($this->state & self::MODIFIED) ? $this->state + self::MODIFIED : $this->state;
   }
 
   public function exists()
   {
-    return $this->state && self::EXIST;
+    return $this->state & self::EXIST;
   }
 
   public function modified()
   {
-    return $this->state && self::MODIFIED;
+    return $this->state & self::MODIFIED;
   }
 
   public function save()
   {
     if (!$this->modified())
     {
+      return false;
+    }
+    else
+    {
+      SlapOrm::getMapInstanceOf(get_class($this))->save($this);
+      $this->state = self::EXIST;
+
+      return true;
+    }
+  }
+
+  public function delete()
+  {
+    if (!$this->exists())
+    {
+      return false;
+    }
+    else
+    {
+      SlapOrm::getMapInstanceOf(get_class($this))->delete($this);
+      $this->state = self::NONE;
+
       return true;
     }
   }

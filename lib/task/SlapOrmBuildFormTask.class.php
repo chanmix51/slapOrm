@@ -92,6 +92,11 @@ $validators
 
     parent::setup();
   }
+
+  protected function getModelName()
+  {
+    return '$class_name';
+  }
 }
 EOF;
     $this->createFile('base/Base'.$class_name.'Form.class.php', $code);

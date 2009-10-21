@@ -7,4 +7,8 @@
 
 class LdapTransportException extends Exception
 {
+  public function __construct($handler, $message)
+  {
+    $this->message = sprintf("%s\nLast LDAP message was -->%s<--", $message, ldap_error($handler));
+  }
 }

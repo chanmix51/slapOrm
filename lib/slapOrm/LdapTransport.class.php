@@ -31,7 +31,7 @@ abstract class LdapTransport
   {
     $slap_orm = SlapOrm::getInstance();
 
-    $object = $slap_orm->getFromMap($cn.','.$this->base_dn);
+    $object = $slap_orm->getFromMap(sprintf('cn=%s,%s',$cn, $this->base_dn));
     if (!$object)
     {
       $query = $this->createQuery()->setCn($cn)->setLimit(1);
@@ -46,10 +46,10 @@ abstract class LdapTransport
   {
     if (!$this->handler = @ldap_connect(sfConfig::get('app_ldap_host', 'localhost'), sfConfig::get('app_ldap_port', 389)))
     {
-      throw new LdapTransportException(sprintf('Error while connecting to ldap host "%s", port "%s <br />LDAP said «%s»."',
+      throw new LdapTransportException($this->handler, sprintf('Error while connecting to ldap host "%s", port "%s".',
         sfConfig::get('app_ldap_host'),
-        sfConfig::get('app_ldap_port'),
-        ldap_error($this->handler)));
+        sfConfig::get('app_ldap_port')
+        ));
     }
   }
 
@@ -59,7 +59,7 @@ abstract class LdapTransport
 
     if (!@ldap_bind($this->handler, sfConfig::get('app_ldap_dn'), sfConfig::get('app_ldap_pass')))
     {
-      throw new LdapTransportException(sprintf('Could not bind to LDAP tree dn="%s", server said «%s»', sfConfig::get('app_ldap_dn'), ldap_error($this->handler)));
+      throw new LdapTransportException($this->handler, sprintf('Could not bind to LDAP tree dn="%s".', sfConfig::get('app_ldap_dn')));
     }
   }
 
@@ -79,48 +79,39 @@ abstract class LdapTransport
 
   public function ldap_search(LdapQuery $query)
   {
-    $dn = $query->getCn() !== '' ? $query->getCn().','.$this->base_dn : $this->base_dn;
+    $dn = $query->getCn() !== '' ? sprintf('cn=%s,%s', $query->getCn(), $this->base_dn) : $this->base_dn;
 
-    $res = ldap_search($this->handler, $dn, $query->getFilters(), $query->getAttributes(), 0, $query->getLimit());
+    $res = @ldap_search($this->handler, $dn, $query->getFilters(), $query->getAttributes(), 0, $query->getLimit());
 
     if ($res === false)
     {
-      throw new LdapTransportException(sprintf('Error during the query "%s" on dn=«%s». <br />Ldap said «%s»', $query, $dn, ldap_error($this->handler)));
+      throw new LdapTransportException($this->handler, sprintf('Error during the query "%s" on dn=«%s».', $query, $dn));
     }
 
     return new LdapResult(ldap_get_entries($this->handler, $res), $this);
   }
 
-  public function ldap_modify($dn = LdapObject, $entry = array())
+  public function ldap_modify(LdapObject $object)
   {
-    $this->res = ldap_modify($this->handler, $dn, $entry);
-
-    return (ldap_error($this->handler) == "Success");
-  }
-
-  public function ldap_add($dn = LdapObject, $entry = array())
-  {
-    $this->res = ldap_add($this->handler, $dn, $entry);
-    
-    if(ldap_error($this->handler) == "Success")
-        return true;
-    else 
+    if (!@ldap_modify($this->handler, $object->getDn(), $object->toArray()))
     {
-      throw new LdapTransportException(sprintf('Could not add object'));
-        return false;
+      throw new LdapTransportException($this->handler, sprintf('Could not modify existing LDAP entry dn="%s"', $object->getDn()));
     }
   }
 
-  public function ldap_delete($dn = LdapObject)
+  public function ldap_add(LdapObject $object)
   {
-    $this->res = ldap_delete($this->handler, $dn);
-    
-    if(ldap_error($this->handler) == "Success")
-        return true;
-    else 
+    if (!@ldap_add($this->handler, $object->getDn(), $object->toArray()))
     {
-      throw new LdapTransportException(sprintf('Could not delete object'));
-        return false;
+      throw new LdapTransportException($this->handler, sprintf('Could not add object dn="%s"', $object->getDn()));
+    }
+  }
+
+  public function delete(LdapObject $object)
+  {
+    if (!@ldap_delete($this->handler, $object->getDn()))
+    {
+      throw new LdapTransportException($this->handler, sprintf('Could not delete object dn="%s".', $object->getDn()));
     }
   }
 
@@ -161,6 +152,18 @@ abstract class LdapTransport
     if ($results->count())
     {
       return $results[0];
+    }
+  }
+
+  public function save(LdapObject $object)
+  {
+    if ($object->exists())
+    {
+      $this->ldap_modify($object);
+    }
+    else
+    {
+      $this->ldap_add($object);
     }
   }
 }
