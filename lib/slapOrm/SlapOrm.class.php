@@ -2,7 +2,7 @@
 
 class SlapOrm
 {
-  const VERSION='Alpha-2';
+  const VERSION='Alpha-3';
 
   protected static $instance;
   protected $data_map = array();
