@@ -143,6 +143,11 @@ abstract class LdapTransport
     return null;
   }
 
+  public function getFields()
+  {
+    return $this->fields;
+  }
+
   public function findAll()
   {
     return $this->ldap_search($this->createQuery());

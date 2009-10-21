@@ -6,6 +6,6 @@ class LdapMailField extends LdapStringField
 
   public function getValidator()
   {
-    return new sfValidatorEmail();
+    return "new sfValidatorEmail()";
   }
 }

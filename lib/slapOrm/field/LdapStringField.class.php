@@ -11,11 +11,11 @@ class LdapStringField extends BaseLdapField
 
   public function getWidget()
   {
-    return $this->length < 256 ? new sfWidgetFormFilterInput() : new sfWidgetFormTextarea();
+    return $this->length < 256 ? "new sfWidgetFormFilterInput()" : "new sfWidgetFormTextarea()";
   }
 
   public function getValidator()
   {
-    return new sfValidatorString(array('max_length' => $this->length));
+    return "new sfValidatorString(array('max_length' => $this->length))";
   }
 }

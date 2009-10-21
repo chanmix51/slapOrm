@@ -1,6 +1,6 @@
 <?php
 
-class SlapOrmTask extends sfBaseTask
+class SlapOrmBuildModelTask extends SlapOrmBaseTask
 {
   protected $schema;
 
@@ -20,36 +20,21 @@ EOF;
 
   protected function execute($arguments = array(), $options = array())
   {
-    $schema_file = sfConfig::get('sf_config_dir').'/slapOrm/schema.yml';
-    if (!file_exists($schema_file))
-    {
-      throw new sfCommandException(sprintf('No schema file found "%s"', $schema_file));
-    }
-    $this->log(sprintf('Found a schema file at "%s". Parsing the schema file', $schema_file));
-    $this->schema = sfYaml::load($schema_file);
-
+    $this->schema = $this->getSchema();
     foreach(array_keys($this->schema) as $class)
     {
-      $this->generateModelClassesFor($class);
+      $this->generateClassesFor($class);
     }
   }
 
-  protected function generateModelClassesFor($class_name)
-  {
-    if (!$this->filesAlreadyExistFor($class_name))
-    {
-      $this->generateUserClassesFor($class_name);
-    }
-    $this->generateBaseClassesFor($class_name);
-  }
 
   protected function filesAlreadyExistFor($class_name)
   {
     return
       (
-        file_exists(sfConfig::get('sf_lib_dir').'/model/slapOrm/'.$class_name.'.class.php')
+        file_exists($this->getPath().'/'.$class_name.'.class.php')
       and
-        file_exists(sfConfig::get('sf_lib_dir').'/model/slapOrm/'.$class_name.'Map.class.php')
+        file_exists($this->getPath().'/'.$class_name.'Map.class.php')
       );
   }
 
@@ -96,7 +81,7 @@ EOF;
  *
  * SlapOrm version $version
  */
-class Base${class_name}Map extends LdapTransport
+abstract class Base${class_name}Map extends LdapTransport
 {
   protected \$base_dn = "$dn";
   protected \$attributes = array($attributes);
@@ -114,34 +99,6 @@ $fields
 }
 EOF;
     $this->createFile('base/Base'.$class_name.'Map.class.php', $code);
-  }
-
-  protected function createFile($file_name, $code)
-  {
-    $file_name = sfConfig::get('sf_lib_dir').'/model/slapOrm/'.$file_name;
-    $this->createLibDirIfNotExist();
-    $this->log('+file '.$file_name);
-
-    if (file_put_contents($file_name, $code) === false)
-    {
-      throw new sfCommandException(sprintf('Could not write to file "%s"', $file_name));
-    }
-  }
-
-  protected function createLibDirIfNotExist()
-  {
-    $base_dir = sfConfig::get('sf_lib_dir').'/model/slapOrm';
-    foreach(array($base_dir, $base_dir.'/base') as $dir)
-    {
-      if (!is_dir($dir))
-      {
-        $this->log('+dir '.$dir);
-        if (!mkdir($dir))
-        {
-          throw new sfCommandException(sprintf('Could not create dir "%s"', $dir));
-        }
-      }
-    }
   }
 
   protected function generateFieldsCode($class_name)
@@ -175,5 +132,10 @@ EOF;
     $fields .= ')';
 
     return $fields;
+  }
+
+  protected function getPath()
+  {
+    return sfConfig::get('sf_lib_dir').'/model/slapOrm';
   }
 }

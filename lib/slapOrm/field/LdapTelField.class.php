@@ -10,11 +10,11 @@ class LdapTelField extends BaseLdapField
 
   public function getWidget()
   {
-    return new sfWidgetFormInput();
+    return "new sfWidgetFormInput()";
   }
 
   public function getValidator()
   {
-    return new sfValidatorString();
+    return "new sfValidatorString()";
   }
 }
