@@ -69,7 +69,7 @@ EOF;
     $this->log(sprintf('Creating base model file for class "%s"', $class_name));
     $attributes = '\''.join('\', \'', array_keys($this->schema[$class_name]['attributes'])).'\'';
     $fields = $this->generateFieldsCode($class_name);
-    $object_class = $this->schema[$class_name]['objectClass'];
+    $object_class = "array('".join("', '", $this->schema[$class_name]['objectClass'])."');";
     $dn = $this->schema[$class_name]['dn'];
     $version = SlapOrm::VERSION;
     $code = <<<EOF
@@ -85,7 +85,7 @@ abstract class Base${class_name}Map extends LdapTransport
 {
   protected \$base_dn = "$dn";
   protected \$attributes = array($attributes);
-  protected \$object_class = '$object_class';
+  protected \$object_class = $object_class
 
   public function configure()
   {

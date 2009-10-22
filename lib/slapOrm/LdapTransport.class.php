@@ -101,7 +101,7 @@ abstract class LdapTransport
 
   public function ldap_add(LdapObject $object)
   {
-    if (!@ldap_add($this->handler, $object->getDn(), $object->toArray()))
+    if (!@ldap_add($this->handler, $object->getCn().','.$this->base_dn, array_merge(array('objectClass' => $this->object_class), $object->toArray())))
     {
       throw new LdapTransportException($this->handler, sprintf('Could not add object dn="%s"', $object->getDn()));
     }
