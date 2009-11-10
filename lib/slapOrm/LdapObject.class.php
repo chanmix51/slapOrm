@@ -15,9 +15,19 @@ abstract class LdapObject implements ArrayAccess
   protected $state = self::NONE;
   protected $dn;
 
+  public function getMapInstance()
+  {
+    return SlapOrm::getMapInstanceOf(get_class($this));
+  }
+
   public function getDn()
   {
     return $this->dn;
+  }
+
+  public function getRdn()
+  {
+    return $this->get($this->getMapInstance()->getRdnField());
   }
 
   public function hydrateFromLdap(array $ldap_vars)

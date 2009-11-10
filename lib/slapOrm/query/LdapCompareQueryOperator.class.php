@@ -16,10 +16,18 @@ class LdapCompareQueryOperator extends LdapBaseQueryOperator
   const EQUIVALENT    = '~=';
 
   protected $operator = self::EQUAL;
+  protected $ml, $mr;
+
+  public function getOperator()
+  {
+    return $operator;
+  }
 
   public function __construct($ml, $mr, $operator = self::EQUAL)
   {
-    parent::__construct($ml, $mr);
+    $this->ml = $ml;
+    $this->mr = $mr;
+
     $this->operator = $operator;
   }
 

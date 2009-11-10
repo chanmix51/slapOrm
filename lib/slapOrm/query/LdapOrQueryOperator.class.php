@@ -8,9 +8,9 @@
 
 class LdapOrQueryOperator extends LdapBaseQueryOperator
 {
-  public function __toString()
+  public function getOperator()
   {
-    return sprintf('(|%s%s)', $this->ml, $this->mr);
+    return '|';
   }
 }
 

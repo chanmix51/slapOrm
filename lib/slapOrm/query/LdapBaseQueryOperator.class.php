@@ -8,14 +8,17 @@
 
 abstract class LdapBaseQueryOperator
 {
-  protected $ml;
-  protected $mr;
+  protected $members = array();
 
-  public function __construct($ml, $mr)
+  abstract public function getOperator();
+
+  public function __construct(Array $members)
   {
-    $this->mr = $mr;
-    $this->ml = $ml;
+    $this->members = $members;
   }
 
-  abstract public function __toString();
+  public function __toString()
+  {
+    return sprintf('(%s%s)', $this->getOperator(), join(',', $this->members));
+  }
 }
