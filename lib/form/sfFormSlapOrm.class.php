@@ -39,7 +39,14 @@ abstract class sfFormSlapOrm extends sfForm
     if ($this->isValid())
     {
       $class_name = $this->getModelName();
-      $object = new $class_name();
+      $map_object = SlapOrm::getMapInstanceOf($this->getModelName());
+      $rdn_field = $map_object->getRdnField();
+
+      $object = $map_object->getByRdn($this->getValue($map_object->getRdnField()));
+      if (!$object)
+      {
+        $object = new $class_name();
+      }
       $object->fromArray($this->getValues());
 
       $this->object = $object;

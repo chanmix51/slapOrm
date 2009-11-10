@@ -54,7 +54,7 @@ EOF;
     $this->log(sprintf('Creating base form file for class "%s"', $class_name));
     $instance = SlapOrm::getMapInstanceOf($class_name);
 
-    $widgets = sprintf("      'dn' => new sfWidgetFormInputHidden(),\n");
+    $widgets = '';
     $validators = '';
     $form_value = sfInflector::underscore($class_name);
 

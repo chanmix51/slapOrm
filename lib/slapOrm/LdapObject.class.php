@@ -184,4 +184,14 @@ abstract class LdapObject implements ArrayAccess
   {
     throw new LdapException(sprintf('<br /><pre>%s</pre>', print_r($this, true)));
   }
+
+  public function get($field)
+  {
+    return $this->__get($field);
+  }
+
+  public function set($field, $value)
+  {
+    return $this->__set($field, $value);
+  }
 }

@@ -14,6 +14,8 @@ abstract class LdapTransport
 
   abstract public function getClassName();
 
+  abstract public function getRdnField();
+
   public function configure()
   {
   }
@@ -27,14 +29,14 @@ abstract class LdapTransport
     return $query;
   }
 
-  public function getByCn($cn)
+  public function getByRdn($rdn)
   {
     $slap_orm = SlapOrm::getInstance();
 
-    $object = $slap_orm->getFromMap(sprintf('cn=%s,%s',$cn, $this->base_dn));
+    $object = $slap_orm->getFromMap(sprintf('%s=%s,%s',$this->getRdnField(), $rdn, $this->base_dn));
     if (!$object)
     {
-      $query = $this->createQuery()->setCn($cn)->setLimit(1);
+      $query = $this->createQuery()->createFilter(new LdapCompareQueryOperator($this->getRdnField(), $rdn))->setLimit(1);
       $result = $this->ldap_search($query);
       $object = count($result) == 1 ? $result[0] : null;
     }
@@ -79,9 +81,7 @@ abstract class LdapTransport
 
   public function ldap_search(LdapQuery $query)
   {
-    $dn = $query->getCn() !== '' ? sprintf('cn=%s,%s', $query->getCn(), $this->base_dn) : $this->base_dn;
-
-    $res = @ldap_search($this->handler, $dn, $query->getFilters(), $query->getAttributes(), 0, $query->getLimit());
+    $res = @ldap_search($this->handler, $this->base_dn, $query->getFilters(), $query->getAttributes(), 0, $query->getLimit());
 
     if ($res === false)
     {
@@ -101,9 +101,11 @@ abstract class LdapTransport
 
   public function ldap_add(LdapObject $object)
   {
-    if (!@ldap_add($this->handler, $object->getCn().','.$this->base_dn, array_merge(array('objectClass' => $this->object_class), $object->toArray())))
+    $dn = sprintf('%s=%s,%s', $this->getRdnField(), $object->get($this->getRdnField()), $this->base_dn);
+    $values = array_merge(array('objectClass' => $this->object_class), $object->toArray());
+    if (!@ldap_add($this->handler, $dn, $values))
     {
-      throw new LdapTransportException($this->handler, sprintf('Could not add object dn="%s"', $object->getDn()));
+      throw new LdapTransportException($this->handler, sprintf('Could not add object dn="%s"', $dn));
     }
   }
 

@@ -8,23 +8,10 @@
 
 class LdapQuery 
 {
-  protected $cn          = '';
   protected $filters;
   protected $limit       = 0;
   protected $attributes  = array();
   protected $objectClass = '';
-
-  public function setCn($cn)
-  {
-    $this->cn = $cn;
-
-    return $this;
-  }
-
-  public function getCn()
-  {
-    return $this->cn;
-  }
 
   public function setLimit($limit = 0)
   {

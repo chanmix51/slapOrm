@@ -71,6 +71,7 @@ EOF;
     $fields = $this->generateFieldsCode($class_name);
     $object_class = "array('".join("', '", $this->schema[$class_name]['objectClass'])."');";
     $dn = $this->schema[$class_name]['dn'];
+    $rdn = $this->schema[$class_name]['rdn'];
     $version = SlapOrm::VERSION;
     $code = <<<EOF
 <?php
@@ -86,6 +87,7 @@ abstract class Base${class_name}Map extends LdapTransport
   protected \$base_dn = "$dn";
   protected \$attributes = array($attributes);
   protected \$object_class = $object_class
+  protected \$rdn = '$rdn';
 
   public function configure()
   {
@@ -95,6 +97,11 @@ $fields
   public function getClassName()
   {
     return '${class_name}';
+  }
+
+  public function getRdnField()
+  {
+    return \$this->rdn;
   }
 }
 EOF;
