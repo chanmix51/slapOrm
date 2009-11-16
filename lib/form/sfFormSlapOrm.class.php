@@ -71,4 +71,5 @@ abstract class sfFormSlapOrm extends sfForm
   {
     return $this->object;
   }
+
 }
