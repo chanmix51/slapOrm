@@ -2,6 +2,11 @@
 
 abstract class SlapOrmBaseTask extends sfBaseTask
 {
+  public function configure()
+  {
+    $this->namespace        = 'slaporm';
+  }
+
   protected function getSchema()
   {
     $schema_file = sfConfig::get('sf_config_dir').'/slapOrm/schema.yml';

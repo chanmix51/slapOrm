@@ -90,7 +90,7 @@ abstract class LdapTransport
 
     if ($res === false)
     {
-      throw new LdapTransportException($this->handler, sprintf('Error during the query "%s" on dn=«%s».', $query, $dn));
+      throw new LdapTransportException($this->handler, sprintf('Error during the query "%s" on dn=«%s».', $query, $this->base_dn));
     }
 
     return new LdapResult(ldap_get_entries($this->handler, $res), $this);

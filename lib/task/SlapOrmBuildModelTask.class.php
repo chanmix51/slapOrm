@@ -4,11 +4,11 @@ class SlapOrmBuildModelTask extends SlapOrmBaseTask
 {
   protected $schema;
 
-  protected function configure()
+  public function configure()
   {
-    $this->namespace        = 'slaporm';
+    parent::configure();
     $this->name             = 'build-model';
-    $this->briefDescription = 'generate LDAP model classes based on the schema definition';
+    $this->briefDescription = 'Generate LDAP model classes based on the schema definition';
     $this->detailedDescription = <<<EOF
 The [slaporm::build-model|INFO] generates your model class files based on the definition given in config/slapOrm/schema.yml
 

@@ -65,6 +65,6 @@ class LdapQuery
 
   public function __toString()
   {
-    return sprintf('cn=«%s», filters=«%s», limit=«%d»', $this->getCn(), $this->getFilters(), $this->getLimit());
+    return sprintf('filters=«%s», limit=«%d»', $this->getFilters(), $this->getLimit());
   }
 }

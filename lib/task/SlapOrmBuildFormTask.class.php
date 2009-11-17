@@ -2,11 +2,11 @@
 
 class SlapOrmBuildFormTask extends SlapOrmBaseTask
 {
-  protected function configure()
+  public function configure()
   {
-    $this->namespace        = 'slaporm';
+    parent::configure();
     $this->name             = 'build-form';
-    $this->briefDescription = 'generate forms associated to the LDAP model class';
+    $this->briefDescription = 'Generate forms associated to the LDAP model classes';
     $this->detailedDescription = <<<EOF
 The [slaporm::build-form|INFO] generates your form class files based on the BaseMap classes
 
