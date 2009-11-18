@@ -9,6 +9,10 @@ class LdapDnField extends BaseLdapField
 
   public function getValidator()
   {
-    return "new sfValidatorRegex(array('pattern' => '/\w+=[^,]+(,\w=[^,]+)*/i'))";
+    $options = $this->getOptionString();
+    $options[] = "'pattern' => '/\w+=[^,]+(,\w=[^,]+)*/i'";
+    $options = join(', ', $options);
+
+    return "new sfValidatorRegex(array($options))";
   }
 }

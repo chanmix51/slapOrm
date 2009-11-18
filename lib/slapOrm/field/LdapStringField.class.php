@@ -16,6 +16,10 @@ class LdapStringField extends BaseLdapField
 
   public function getValidator()
   {
-    return "new sfValidatorString(array('max_length' => $this->length))";
+    $options = $this->getOptionString();
+    $options[] = "'max_length' => $this->length";
+    $options = join(', ', $options);
+
+    return "new sfValidatorString(array($options))";
   }
 }

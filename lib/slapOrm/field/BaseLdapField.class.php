@@ -4,6 +4,7 @@ abstract class BaseLdapField
 {
   protected $type;
   protected $multiple = false;
+  protected $required = false;
 
   public function __construct(Array $parameters)
   {
@@ -26,6 +27,18 @@ abstract class BaseLdapField
   public function getMultiple()
   {
     return $this->multiple;
+  }
+
+  public function isRequired()
+  {
+    return $this->required;
+  }
+
+  protected function getOptionString()
+  {
+    $required = $this->isRequired() ? "true" : "false";
+
+    return array("'required' => $required");
   }
 
   abstract function getWidget();

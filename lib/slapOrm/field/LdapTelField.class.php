@@ -15,6 +15,7 @@ class LdapTelField extends BaseLdapField
 
   public function getValidator()
   {
+    $options = join(', ', $this->getOptionString());
     return "new sfValidatorString()";
   }
 }

@@ -6,6 +6,8 @@ class LdapMailField extends LdapStringField
 
   public function getValidator()
   {
-    return "new sfValidatorEmail()";
+    $options = join(', ', $this->getOptionString());
+
+    return "new sfValidatorEmail(array($options))";
   }
 }
