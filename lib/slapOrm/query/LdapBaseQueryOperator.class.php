@@ -19,6 +19,6 @@ abstract class LdapBaseQueryOperator
 
   public function __toString()
   {
-    return sprintf('(%s%s)', $this->getOperator(), join(',', $this->members));
+    return sprintf('(%s%s)', $this->getOperator(), join('', $this->members));
   }
 }
