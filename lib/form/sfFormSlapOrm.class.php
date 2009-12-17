@@ -38,6 +38,7 @@ abstract class sfFormSlapOrm extends sfForm
 
     if ($this->isValid())
     {
+      $this->processValues();
       $class_name = $this->getModelName();
       $map_object = SlapOrm::getMapInstanceOf($this->getModelName());
       $rdn_field = $map_object->getRdnField();
@@ -72,4 +73,23 @@ abstract class sfFormSlapOrm extends sfForm
     return $this->object;
   }
 
+  public function processValues()
+  {
+    foreach ($this->values as $field_name => $value)
+    {
+      $method = sprintf('process%sValue', $this->camelize($field_name));
+
+      if (method_exists($this, $method))
+      {
+        if (NULL == $return_code = $this->method($value))
+        {
+          unset($this->values[$field_name]);
+        }
+        else
+        {
+          $this->values[$field_name] = $return_code;
+        }
+      }
+    }
+  }
 }
