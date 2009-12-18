@@ -46,14 +46,14 @@ class LdapQuery
 
   public function addAndFilter(LdapBaseQueryOperator $operator)
   {
-    $this->filters = new LdapAndQueryOperator($this->filters, $operator);
+    $this->filters = new LdapAndQueryOperator(array($this->filters, $operator));
 
     return $this;
   }
 
   public function addOrFilter(LdapBaseQueryOperator $operator)
   {
-    $this->filters = new LdapOrQueryOperator($this->filters, $operator);
+    $this->filters = new LdapOrQueryOperator(array($this->filters, $operator));
 
     return $this;
   }

@@ -77,11 +77,11 @@ abstract class sfFormSlapOrm extends sfForm
   {
     foreach ($this->values as $field_name => $value)
     {
-      $method = sprintf('process%sValue', $this->camelize($field_name));
+      $method = sprintf('process%sValue', sfInflector::camelize($field_name));
 
       if (method_exists($this, $method))
       {
-        if (NULL == $return_code = $this->method($value))
+        if (NULL == $return_code = $this->$method($value))
         {
           unset($this->values[$field_name]);
         }
