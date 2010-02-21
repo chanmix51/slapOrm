@@ -70,22 +70,29 @@ abstract class LdapTransport
     }
   }
 
-  public function __construct()
+  public function connect()
   {
-    $this->handler = SlapOrm::getInstance()->getConnectionFor($this->getClassName());
-
     if (is_null($this->handler))
     {
-      $this->openConnection();
-      SlapOrm::getInstance()->setConnectionFor($this->getClassName(), $this->handler);
-      $this->bindToLdap();
-    }
+      $this->handler = SlapOrm::getInstance()->getConnectionFor($this->getClassName());
 
+      if (is_null($this->handler))
+      {
+        $this->openConnection();
+        SlapOrm::getInstance()->setConnectionFor($this->getClassName(), $this->handler);
+        $this->bindToLdap();
+      }
+    }
+  }
+
+  public function __construct()
+  {
     $this->configure();
   }
 
   public function ldap_search(LdapQuery $query)
   {
+    $this->connect();
     $res = @ldap_search($this->handler, $this->base_dn, $query->getFilters(), $query->getAttributes(), 0, $query->getLimit());
 
     if ($res === false)
@@ -98,6 +105,7 @@ abstract class LdapTransport
 
   public function ldap_modify(LdapObject $object)
   {
+    $this->connect();
     if (!@ldap_modify($this->handler, $object->getDn(), $object->toArray()))
     {
       throw new LdapTransportException($this->handler, sprintf('Could not modify existing LDAP entry dn="%s"', $object->getDn()));
@@ -106,6 +114,7 @@ abstract class LdapTransport
 
   public function ldap_add(LdapObject $object)
   {
+    $this->connect();
     $dn = sprintf('%s=%s,%s', $this->getRdnField(), $object->get($this->getRdnField()), $this->base_dn);
     $values = array_merge(array('objectClass' => $this->object_class), $object->toArray());
     if (!@ldap_add($this->handler, $dn, $values))
@@ -116,6 +125,7 @@ abstract class LdapTransport
 
   public function delete(LdapObject $object)
   {
+    $this->connect();
     if (!@ldap_delete($this->handler, $object->getDn()))
     {
       throw new LdapTransportException($this->handler, sprintf('Could not delete object dn="%s".', $object->getDn()));
